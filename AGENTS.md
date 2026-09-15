@@ -15,7 +15,7 @@ Read these before writing code — they override anything in this summary:
 
 ## Stack
 
-NestJS 11 · TypeScript (strict null checks) · TypeORM + MySQL · Redis (cache, BullMQ) · Passport JWT · Jest · Swagger at `/docs`.
+NestJS 11 · TypeScript (strict null checks) · TypeORM + MySQL · Redis (cache, BullMQ) · Passport JWT · Jest · Swagger at `/api/docs`.
 
 ## Commands
 
@@ -37,6 +37,7 @@ npm run migration:run    # apply migrations
 - **Input:** a `class-validator` DTO for every body, query and param. More than two internal params → interface.
 - **No magic values:** enums in `src/common/enums`, constants in `src/common/constants`.
 - **Responses:** return plain data; `TransformInterceptor` wraps `{ success, message, data }`. Throw Nest HTTP exceptions for errors.
+- **Deployment (Launchpad):** `launchpad.json` defines how the app runs. Everything stays under `/api` (don't change `API_PREFIX`); `GET /api/health` must stay public and version-neutral. DB variables are `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`.
 - **Auth:** the JWT guard is global. Mark public routes with `@Public()`; restrict with `@Roles()`.
 - **Config & secrets:** only via `ConfigService`; new env vars go in `src/config/*.config.ts` and `.env.example`. Never commit credentials. Never log passwords/tokens (extend `SENSITIVE_FIELDS`).
 - **Database:** `synchronize` is off. Every schema change is a migration in `src/database/migrations` with `up()` and `down()`. No queries in loops; select only needed columns; parameterize SQL.

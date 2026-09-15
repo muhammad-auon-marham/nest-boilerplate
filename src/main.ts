@@ -1,6 +1,7 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import * as compression from 'compression';
@@ -21,7 +22,7 @@ import { ApiLogService } from './modules/logging/services/api-log.service';
 };
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
   });
@@ -34,6 +35,9 @@ async function bootstrap() {
 
   app.useLogger(logger);
 
+  // Behind a reverse proxy (Launchpad, Docker): resolve the real client IP
+  app.set('trust proxy', configService.get<string>('app.trustProxy'));
+
   // Security
   app.use(helmet());
   app.use(compression());
@@ -42,8 +46,9 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Global prefix and versioning: /api/v1/...
-  app.setGlobalPrefix(configService.get<string>('app.apiPrefix') ?? 'api');
+  // Global prefix and versioning: /api/v1/... — everything must stay under /api (Launchpad routes it here)
+  const apiPrefix = configService.get<string>('app.apiPrefix') ?? 'api';
+  app.setGlobalPrefix(apiPrefix);
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: '1',
@@ -65,7 +70,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(
     new TransformInterceptor(),
     new LoggingInterceptor(logger),
-    new ApiLoggingInterceptor(app.get(ApiLogService)),
+    new ApiLoggingInterceptor(app.get(ApiLogService), app.get(Reflector)),
   );
 
   // Swagger documentation
@@ -77,15 +82,16 @@ async function bootstrap() {
       .addBearerAuth()
       .build();
     const document = SwaggerModule.createDocument(app, swaggerConfig);
-    SwaggerModule.setup('docs', app, document);
+    SwaggerModule.setup(`${apiPrefix}/docs`, app, document);
   }
 
   app.enableShutdownHooks();
 
   const port = configService.get<number>('app.port') || 3000;
-  await app.listen(port, '0.0.0.0');
+  const host = configService.get<string>('app.host') ?? '0.0.0.0';
+  await app.listen(port, host);
 
-  logger.log(`Application running on port ${port}`, 'Bootstrap');
+  logger.log(`Application running on ${host}:${port}`, 'Bootstrap');
 }
 
 void bootstrap();

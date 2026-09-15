@@ -62,7 +62,7 @@ npm run migration:run
 ### Step 5: Smoke Testing
 ```bash
 npm run start:prod
-curl -f http://localhost:3000/api/v1/health
+curl -f http://localhost:3000/api/health
 ```
 
 ### Step 6: Production Deployment

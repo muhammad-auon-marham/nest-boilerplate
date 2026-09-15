@@ -13,7 +13,7 @@ A production-ready starting point for NestJS APIs: layered module architecture, 
 | Realtime | Socket.IO gateways (optional) |
 | Security | Helmet, CORS, global rate limiting, bcrypt, request-log redaction |
 | Observability | Winston daily-rotating logs, correlation IDs, `api_logs` table |
-| Docs | Swagger at `/docs` (non-production) |
+| Docs | Swagger at `/api/docs` (non-production) |
 | Quality | ESLint + Prettier, Jest, guideline validator, GitHub Actions CI |
 
 ## Getting started
@@ -33,8 +33,8 @@ npm run start:dev
 ```
 
 - API: `http://localhost:3000/api/v1`
-- Health: `http://localhost:3000/api/v1/health`
-- Swagger: `http://localhost:3000/docs`
+- Health: `http://localhost:3000/api/health`
+- Swagger: `http://localhost:3000/api/docs`
 
 ### Docker
 
@@ -68,14 +68,31 @@ All variables are documented in [`.env.example`](./.env.example) and read throug
 
 | File | Namespace | Key variables |
 |------|-----------|---------------|
-| `app.config.ts` | `app` | `NODE_ENV`, `PORT`, `API_PREFIX`, `CORS_ORIGIN`, `TZ`, `THROTTLE_TTL`, `THROTTLE_LIMIT` |
-| `database.config.ts` | `database` | `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_DATABASE`, `DB_LOGGING`, `DB_TIMEZONE` |
-| `jwt.config.ts` | `jwt` | `JWT_SECRET`, `JWT_EXPIRES_IN`, `JWT_REFRESH_SECRET`, `JWT_REFRESH_EXPIRES_IN` |
+| `app.config.ts` | `app` | `NODE_ENV`, `HOST`, `PORT`, `API_PREFIX`, `CORS_ORIGIN`, `TRUST_PROXY`, `TZ`, `THROTTLE_TTL`, `THROTTLE_LIMIT` |
+| `database.config.ts` | `database` | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_LOGGING`, `DB_TIMEZONE` |
+| `jwt.config.ts` | `jwt` | `JWT_SECRET`, `JWT_EXPIRES_IN`, `JWT_REFRESH_SECRET`, `JWT_REFRESH_EXPIRES_IN` (secrets derive from `DB_PASSWORD` when unset) |
 | `redis.config.ts` / `queue.config.ts` | `redis` / `queue` | `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`, `REDIS_DB`, `REDIS_PREFIX` |
 | `cache.config.ts` | `cache` | `CACHE_DRIVER` (`memory`\|`redis`), `CACHE_TTL` |
 | `mail.config.ts` | `mail` | `MAIL_HOST`, `MAIL_PORT`, `MAIL_SECURE`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_*` |
 
 Never commit `.env` files or credential files; `.gitignore` already excludes them.
+
+## Launchpad
+
+`launchpad.json` describes how Launchpad runs this template:
+
+| Key | Value |
+|-----|-------|
+| Dev / start | `npm run start:dev` / `node dist/main.js` on port 3000, host `HOST` (`0.0.0.0`) |
+| Health | `GET /api/health` (version-neutral, public, not stored in `api_logs`) |
+| Migrations | `migrate` → `npm run migration:run`; `generateMigration` writes to `src/database/migrations` |
+| Check | `npx tsc --noEmit` |
+
+- Launchpad routes `/api` to this app and everything else to the frontend, so keep `API_PREFIX=api`. Swagger lives at `/api/docs` for the same reason.
+- Launchpad injects `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `PORT`, `HOST` and `NODE_ENV`. `launchpad.json` adds `CORS_ORIGIN={{publicUrl}}`.
+- `launchpad.json` cannot hold secrets, so when `JWT_SECRET` / `JWT_REFRESH_SECRET` are unset they are derived (HMAC-SHA256) from `DB_PASSWORD`. Set them explicitly anywhere you can; rotating `DB_PASSWORD` otherwise signs everyone out.
+- `TRUST_PROXY` defaults to private-network proxies, so rate limiting and logs see the real client IP behind Launchpad.
+- Redis is optional: the cache defaults to memory and BullMQ jobs are not wired into `AppModule` by default.
 
 ## Folder structure
 

@@ -39,9 +39,9 @@ describe('App (e2e)', () => {
     await app?.close();
   });
 
-  it('GET /api/v1/health is public and wrapped in the standard envelope', () => {
+  it('GET /api/health is public and wrapped in the standard envelope', () => {
     return request(app.getHttpServer())
-      .get('/api/v1/health')
+      .get('/api/health')
       .expect(200)
       .expect((res) => {
         expect(res.body.success).toBe(true);

@@ -29,8 +29,8 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD in .env}
-      MYSQL_DATABASE: ${DB_DATABASE:-app_db}
-      MYSQL_USER: ${DB_USERNAME:-app}
+      MYSQL_DATABASE: ${DB_NAME:-app_db}
+      MYSQL_USER: ${DB_USER:-app}
       MYSQL_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
     ports:
       - "127.0.0.1:${DB_PORT:-3306}:3306"

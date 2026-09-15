@@ -979,7 +979,7 @@ async findAll(query: PaginationQueryDto): Promise<PaginatedResult<User>> {
 
 ### 9.4 Swagger Documentation
 
-**Always document APIs with Swagger** (served at `/docs` outside production):
+**Always document APIs with Swagger** (served at `/api/docs` outside production):
 
 ```typescript
 @ApiTags('Products')

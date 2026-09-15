@@ -1,0 +1,16 @@
+{
+  "port": 3000,
+  "install": "npm install --include=dev",
+  "dev": "npm run start:dev",
+  "build": "npm run build",
+  "start": "node dist/main.js",
+  "healthPath": "/api/health",
+  "migrate": "npm run migration:run",
+  "generateMigration": "npm run migration:generate -- src/database/migrations/{name} && npx prettier --write src/database/migrations",
+  "migrationsDir": "src/database/migrations",
+  "check": "npx tsc --noEmit",
+  "env": {
+    "CORS_ORIGIN": "{{publicUrl}}"
+  },
+  "agentNotes": "NestJS 11 + TypeORM (MySQL) API. Read AGENTS.md and .ai/steering/project-guidelines.md before writing code. Every route lives under /api (global prefix) and is URI-versioned, so feature routes are /api/v1/<resource>; only /api/health and /api/docs are version-neutral. Layering: thin controller -> service (business logic) -> repository (all queries, extends src/common/repositories/base.repository.ts; never @InjectRepository in modules). Copy the structure of src/modules/users for new modules (controllers/ dto/ entities/ repositories/ services/ __tests__/) and register them in app.module.ts. Validate every body/query/param with a class-validator DTO. Return plain data: TransformInterceptor wraps responses as { success, message, data }; throw Nest HTTP exceptions for errors. The JWT guard is global: mark public routes with @Public(), restrict with @Roles(). Read configuration only through ConfigService and src/config/*.config.ts; database variables are DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD and are injected for you. Never commit secrets. synchronize is off: every schema change needs an entity change plus a migration (use generate_migration, then review up() and down()). Use path aliases (@common, @core, @modules, @config). No console.log; use LoggerService. Add unit tests in the module's __tests__ folder and keep npm run build, npm run lint:check and npm test passing. Redis/BullMQ jobs are optional and not wired by default; don't add Redis-dependent code unless asked."
+}

@@ -1,7 +1,7 @@
 # API Documentation
 
 Base URL: `http://localhost:3000/api/v1`
-Interactive docs (non-production): `http://localhost:3000/docs`
+Interactive docs (non-production): `http://localhost:3000/api/docs`
 
 All responses use the envelope described in [API_RESPONSE_FORMAT.md](./API_RESPONSE_FORMAT.md).
 Unless marked **Public**, endpoints require `Authorization: Bearer <accessToken>`.
@@ -14,8 +14,8 @@ Optional client headers (stored on `api_logs`): `app-type` (`AppType` enum), `de
 
 ## Health
 
-### `GET /health` — Public
-Liveness probe.
+### `GET /api/health` — Public
+Liveness probe. Version-neutral (no `/v1`) so the path stays stable for deployment health checks; not stored in `api_logs`.
 
 **Response `200`**
 ```json
