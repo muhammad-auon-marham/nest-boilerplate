@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "skills": {
+    "api-testing-patterns": {
+      "source": "proffesor-for-testing/agentic-qe",
+      "sourceType": "github",
+      "computedHash": "9e6bb85e82285dcd32ee6ebc5f28bb57e63a9541a6c420da9b100bd8b49515cd"
+    },
+    "e2e-testing-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "3425e335940b8f1f4881452603252385f9119159632dc211bc8c8a375f4619cd"
+    }
+  }
+}

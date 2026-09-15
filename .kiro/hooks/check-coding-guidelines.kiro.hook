@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Check Coding Guidelines",
+  "description": "Reminds the agent to verify code changes follow project guidelines before writing files",
+  "version": "1",
+  "when": {
+    "type": "preToolUse",
+    "toolTypes": [
+      "write"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Before writing this code, verify it follows ALL guidelines in .ai/steering/project-guidelines.md and .ai/steering/CRITICAL-RULES-CHECKLIST.md:\n- Queries ONLY in repositories (never in services)\n- Repositories extend src/common/repositories/base.repository.ts; no @InjectRepository(Entity)\n- Use @ path aliases for 2+ directories back\n- DTOs (class-validator) for every request input\n- Enums/constants instead of magic values\n- ConfigService instead of process.env; never log secrets\n- Max 1 blank line before/after functions\n- Unit tests in the module's __tests__ folder\n\nIf the code violates any guideline, STOP and fix it first."
+  }
+}

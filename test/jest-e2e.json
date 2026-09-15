@@ -1,0 +1,20 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": "\\.e2e-spec\\.ts$",
+  "transform": {
+    "^.+\\.ts$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^uuid$": "<rootDir>/../src/__mocks__/uuid.js",
+    "^src/(.*)$": "<rootDir>/../src/$1",
+    "^@/(.*)$": "<rootDir>/../src/$1",
+    "^@common/(.*)$": "<rootDir>/../src/common/$1",
+    "^@config/(.*)$": "<rootDir>/../src/config/$1",
+    "^@core/(.*)$": "<rootDir>/../src/core/$1",
+    "^@modules/(.*)$": "<rootDir>/../src/modules/$1",
+    "^@jobs/(.*)$": "<rootDir>/../src/jobs/$1",
+    "^@gateways/(.*)$": "<rootDir>/../src/gateways/$1"
+  }
+}
